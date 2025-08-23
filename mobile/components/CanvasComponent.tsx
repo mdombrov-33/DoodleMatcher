@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Button, StyleSheet, PanResponder } from "react-native";
+import { View, Text, PanResponder, Pressable, StyleSheet } from "react-native";
 import { Canvas, Line, useCanvasRef } from "@shopify/react-native-skia";
 import { Point, Stroke } from "@/types/canvas";
 
@@ -43,7 +43,7 @@ function CanvasComponent() {
   const handleSave = async () => {
     if (canvasRef.current) {
       try {
-        //* Convert canvas to bitmap image
+        // Convert canvas to bitmap image
         const image = canvasRef.current.makeImageSnapshot();
         if (image) {
           const base64 = image.encodeToBase64();
@@ -55,7 +55,7 @@ function CanvasComponent() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              image: base64, //* The PNG as base64 string
+              image: base64, // The PNG as base64 string
             }),
           });
 
@@ -88,8 +88,9 @@ function CanvasComponent() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.canvasContainer} {...panResponder.panHandlers}>
+    <View className="flex-1 bg-background">
+      {/* Canvas Container */}
+      <View className="flex-1 m-2.5" {...panResponder.panHandlers}>
         <Canvas ref={canvasRef} style={styles.canvas}>
           {/* Render completed strokes */}
           {strokes.map((stroke, index) => renderStroke(stroke.points, index))}
@@ -99,34 +100,40 @@ function CanvasComponent() {
         </Canvas>
       </View>
 
-      <View style={styles.buttonContainer}>
-        <Button title="Clear" onPress={handleClear} />
-        <Button title="Search" onPress={handleSave} />
+      {/* Button Container */}
+      <View className="flex-row justify-center items-center py-5 px-5 gap-4 bg-surface">
+        <Pressable
+          className="px-6 py-3 rounded-lg bg-secondary active:opacity-80 active:scale-95 min-w-[100]"
+          onPress={handleClear}
+        >
+          <Text className="text-white font-semibold text-base text-center">
+            Clear
+          </Text>
+        </Pressable>
+
+        <Pressable
+          className="px-6 py-3 rounded-lg bg-primary active:opacity-80 active:scale-95 min-w-[100]"
+          onPress={handleSave}
+        >
+          <Text className="text-white font-semibold text-base text-center">
+            Search
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-  },
-  canvasContainer: {
-    flex: 1,
-    margin: 10,
-  },
   canvas: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: "#fff", // surface color
     borderRadius: 8,
-  },
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    paddingVertical: 15,
-    gap: 15,
-    backgroundColor: "white",
+    elevation: 2, // Android shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
 });
 
