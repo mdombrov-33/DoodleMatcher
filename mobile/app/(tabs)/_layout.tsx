@@ -4,7 +4,14 @@ import { theme } from "@/constants/theme";
 
 export default function Layout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: theme.colorPrimary }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: theme.colorPrimary,
+        tabBarLabelStyle: {
+          fontSize: 14,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
