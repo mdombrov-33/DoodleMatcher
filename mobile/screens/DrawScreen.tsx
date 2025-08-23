@@ -1,9 +1,5 @@
-import { Text, View } from "react-native";
+import DrawCanvas from "@/components/DrawCanvas";
 
 export default function DrawScreen() {
-  return (
-    <View>
-      <Text className="text-3xl">Draw</Text>
-    </View>
-  );
+  return <DrawCanvas />;
 }
