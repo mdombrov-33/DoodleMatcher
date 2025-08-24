@@ -1,5 +1,5 @@
 import DrawScreen from "@/screens/DrawScreen";
 
-export default function History() {
+export default function Draw() {
   return <DrawScreen />;
 }

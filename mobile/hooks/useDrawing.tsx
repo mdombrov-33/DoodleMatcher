@@ -1,10 +1,9 @@
-import React, { useState } from "react";
-import { View, Text, PanResponder, Pressable, StyleSheet } from "react-native";
-import { Canvas, Line, useCanvasRef } from "@shopify/react-native-skia";
 import { Point, Stroke } from "@/types/canvas";
-import ActionButton from "./ActionButton";
+import { Line, useCanvasRef } from "@shopify/react-native-skia";
+import React, { useState } from "react";
+import { PanResponder } from "react-native";
 
-export default function DrawingCanvas() {
+export function useDrawing() {
   const canvasRef = useCanvasRef();
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
@@ -74,51 +73,29 @@ export default function DrawingCanvas() {
   const renderStroke = (points: Point[], key: string | number) => {
     if (points.length < 2) return null;
 
-    return points
-      .slice(1)
-      .map((point, index) => (
-        <Line
-          key={`${key}-${index}`}
-          p1={{ x: points[index].x, y: points[index].y }}
-          p2={{ x: point.x, y: point.y }}
-          color="#2c3e50"
-          strokeWidth={2.5}
-          strokeCap="round"
-        />
-      ));
+    return (
+      <React.Fragment key={key}>
+        {points.slice(1).map((point, index) => (
+          <Line
+            key={`${key}-${index}`}
+            p1={{ x: points[index].x, y: points[index].y }}
+            p2={{ x: point.x, y: point.y }}
+            color="#2c3e50"
+            strokeWidth={2.5}
+            strokeCap="round"
+          />
+        ))}
+      </React.Fragment>
+    );
   };
 
-  return (
-    <View className="flex-1 bg-background">
-      {/* Canvas Container */}
-      <View className="flex-1 m-2.5" {...panResponder.panHandlers}>
-        <Canvas ref={canvasRef} style={styles.canvas}>
-          {/* Render completed strokes */}
-          {strokes.map((stroke, index) => renderStroke(stroke.points, index))}
-
-          {/* Render current stroke */}
-          {renderStroke(currentStroke, "current")}
-        </Canvas>
-      </View>
-
-      {/* Button Container */}
-      <View className="flex-row justify-center items-center py-5 px-5 gap-4 bg-surface">
-        <ActionButton title="Clear" onPress={handleClear} variant="secondary" />
-        <ActionButton title="Search" onPress={handleSave} />
-      </View>
-    </View>
-  );
+  return {
+    strokes,
+    panResponder,
+    handleSave,
+    handleClear,
+    canvasRef,
+    currentStroke,
+    renderStroke,
+  };
 }
-
-const styles = StyleSheet.create({
-  canvas: {
-    flex: 1,
-    backgroundColor: "#fff", // surface color
-    borderRadius: 8,
-    elevation: 2, // Android shadow
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-});
