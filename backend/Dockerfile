@@ -20,6 +20,3 @@ COPY . /app
 
 # Expose port the app runs on
 EXPOSE 8000
-
-# Command to run the app with reload (for dev)
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
