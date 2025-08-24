@@ -6,6 +6,7 @@ __pycache__/
 *.sqlite3
 .env
 venv/
+.venv/
 .git/
 node_modules/
 qdrant_data/
