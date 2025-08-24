@@ -36,7 +36,12 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Virtual Environment
+.venv
+
+# Build
 android
 ios
 
+# Copilot Reference md
 .copilot
