@@ -38,41 +38,35 @@ export function useDrawing() {
     setStrokes([]);
     setCurrentStroke([]);
     setIsDrawing(false);
+    console.log("Canvas cleared");
   };
 
   const handleSave = async () => {
     if (canvasRef.current) {
       try {
-        // Convert canvas to bitmap image
         const image = canvasRef.current.makeImageSnapshot();
         if (image) {
           const base64 = image.encodeToBase64();
-          console.log("Drawing saved as PNG base64, length:", base64?.length);
+          console.log("Drawing saved, length:", base64?.length);
 
-          const response = await fetch("URL/search-doodle", {
+          const response = await fetch("http://localhost:8000/search-doodle", {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              image_data: base64, // The PNG as base64 string
-            }),
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image_data: base64 }),
           });
 
           const matches = await response.json();
-          console.log("Got matches:", matches);
-
+          console.log("Matches received:", matches);
           return matches;
         }
       } catch (error) {
-        console.error("Error saving/searching:", error);
+        console.error("Error during save/search:", error);
       }
     }
   };
 
   const renderStroke = (points: Point[], key: string | number) => {
     if (points.length < 2) return null;
-
     return (
       <React.Fragment key={key}>
         {points.slice(1).map((point, index) => (

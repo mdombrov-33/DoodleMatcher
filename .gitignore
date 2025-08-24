@@ -50,4 +50,8 @@ ios
 # Copilot Reference md
 .copilot
 
+# Qdrant Data
 qdrant_data
+
+# Downloaded models
+/backend/models/

@@ -1,47 +1,66 @@
-import requests
+from pathlib import Path
 import numpy as np
 from PIL import Image
-import io
-from typing import Optional
-import os
+import onnxruntime as ort
 
-HF_API_TOKEN = os.getenv("HF_API_TOKEN")
-HF_API_URL = "https://api-inference.huggingface.co/models/openai/clip-vit-base-patch16"
+# Setup
+BASE_DIR = Path(__file__).resolve().parent.parent
+MODEL_PATH = BASE_DIR / "models/clip/clip-vit-base-patch32.onnx"
+
+# Check model exists
+if not MODEL_PATH.exists():
+    raise FileNotFoundError(f"Model not found: {MODEL_PATH}")
+
+# Load model
+session = ort.InferenceSession(str(MODEL_PATH), providers=["CPUExecutionProvider"])
+
+# Get the actual input name from the model
+input_name = session.get_inputs()[0].name
+print(f"Model input name: {input_name}")
 
 
-def get_image_embedding(image: Image.Image) -> Optional[np.ndarray]:
-    """
-    Takes a PIL Image and returns its CLIP embedding using Hugging Face API.
-    """
+def preprocess_image(image: Image.Image) -> np.ndarray:
+    """Convert PIL image to model input format with proper CLIP preprocessing."""
+    # Resize and convert to RGB
+    image = image.convert("RGB").resize((224, 224))
+
+    # Convert to array and normalize to [-1, 1] range (CLIP standard)
+    img_array = np.array(image, dtype=np.float32)
+    img_array = (img_array / 255.0 - 0.5) / 0.5  # Normalize to [-1, 1]
+
+    # Change from HWC to CHW format
+    img_array = img_array.transpose(2, 0, 1)
+
+    # Add batch dimension: (1, 3, 224, 224)
+    img_array = img_array[np.newaxis, ...]
+
+    return img_array
+
+
+def get_image_embedding(image: Image.Image) -> np.ndarray:
+    """Get normalized embedding for an image."""
     try:
-        # Convert PIL Image to bytes
-        img_buffer = io.BytesIO()
-        image.save(img_buffer, format="PNG")
-        img_buffer.seek(0)
+        # Preprocess
+        input_data = preprocess_image(image)
 
-        # Prepare the API request
-        headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+        # Run inference with correct input name
+        outputs = session.run(None, {input_name: input_data})
+        embedding = outputs[0]  # First output should be image embeddings
 
-        # Send image to Hugging Face API
-        response = requests.post(
-            HF_API_URL,
-            headers=headers,
-            files={"inputs": img_buffer.getvalue()},
-            timeout=30,
-        )
+        # Remove batch dimension if needed
+        if embedding.ndim == 2 and embedding.shape[0] == 1:
+            embedding = embedding[0]
 
-        if response.status_code == 200:
-            # The API returns the embedding directly
-            embedding = np.array(response.json())
+        # Convert to float64 for better precision
+        embedding = embedding.astype(np.float64)
 
-            # Normalize the embedding
-            embedding = embedding / np.linalg.norm(embedding)
+        # Normalize
+        norm = np.linalg.norm(embedding)
+        if norm > 0:
+            embedding = embedding / norm
 
-            return embedding.flatten()
-        else:
-            print(f"HF API error: {response.status_code} - {response.text}")
-            return None
+        return embedding
 
     except Exception as e:
-        print(f"Error getting embedding: {e}")
+        print(f"Error generating embedding: {e}")
         return None

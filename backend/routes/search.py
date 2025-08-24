@@ -5,7 +5,7 @@ import time
 from fastapi import HTTPException, APIRouter
 from PIL import Image
 
-from models.search import SearchRequest, SearchResponse, MatchResult
+from schemas.search import SearchRequest, SearchResponse, MatchResult
 from services.clip_service import get_image_embedding
 from services.qdrant_service import search_similar_images
 
@@ -28,6 +28,9 @@ async def search_doodle(request: SearchRequest):
 
         # 2. Convert to PIL Image
         image = Image.open(io.BytesIO(image_bytes))
+
+        # Preprocess image
+        image = image.convert("RGB").resize((224, 224))
 
         # 3. Generate CLIP embedding
         embedding = get_image_embedding(image)
