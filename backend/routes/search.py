@@ -56,7 +56,7 @@ async def search_doodle(request: SearchRequest):
 
         return SearchResponse(matches=matches, search_time_ms=search_time_ms)
 
-    except binascii.Error:  # Fixed: now properly imported
+    except binascii.Error:
         raise HTTPException(status_code=400, detail="Invalid base64 image data")
     except Exception as e:
         print(f"Search error: {e}")
