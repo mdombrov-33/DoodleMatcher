@@ -6,10 +6,12 @@ services:
       - "8000:8000"
     depends_on:
       - qdrant
+    restart: unless-stopped
 
   qdrant:
     image: qdrant/qdrant:latest
     ports:
       - "6333:6333"
     volumes:
-      - ../qdrant_data:/qdrant/storage
+      - ./qdrant_data:/qdrant/storage
+    restart: unless-stopped
