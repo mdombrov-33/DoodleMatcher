@@ -19,7 +19,7 @@ User Drawing → CLIP Embeddings → Vector Search → Top 3 Matches
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │                 │    │                 │    │                 │
-│   Expo/RN App   │───▶│   FastAPI       │───▶│   Qdrant        │
+│   Expo/RN App   │────│   FastAPI       │────│   Qdrant        │
 │                 │    │                 │    │                 │
 │ • Canvas Drawing│    │ • CLIP Model    │    │ • Vector Search │
 │ • Results UI    │    │ • Embeddings    │    │ • Similarity    │
