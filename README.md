@@ -35,7 +35,7 @@ User Drawing → CLIP Embeddings → Vector Search → Top 3 Matches
 
 - **Expo/React Native** - Cross-platform mobile development
 - **TypeScript** - Type safety and better DX
-- **React Native SVG** - Smooth vector-based drawing
+- **React Native-Skia** - High-performance 2D graphics and smooth vector drawing canvas
 - **Expo Router** - File-based navigation
 - **NativeWind** - Tailwind CSS for React Native
 
@@ -64,7 +64,6 @@ The app has three main states on a single screen:
 ### 2. Loading State
 
 - Embedding generation in progress
-- Real-time search status
 - Cancel option available
 
 ### 3. Results State
@@ -113,7 +112,7 @@ doodle-matcher/
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn
-- Python 3.9+ with Poetry
+- Python 3.10+ with Poetry
 - Expo CLI (`npm install -g @expo/cli`)
 
 ### Local Development
@@ -121,8 +120,8 @@ doodle-matcher/
 1. **Clone and install dependencies**
 
 ```bash
-git clone https://github.com/yourusername/doodle-matcher.git
-cd doodle-matcher
+git clone https://github.com/yourusername/DoodleMatcher.git
+cd DoodleMatcher
 
 # Backend
 cd backend
@@ -137,16 +136,18 @@ npm install
 2. **Start local services**
 
 ```bash
-# Start Qdrant (using Docker)
-docker run -p 6333:6333 qdrant/qdrant
+# Start all backend services with Docker Compose
+docker-compose up
 
-# Start FastAPI backend
-cd backend
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# Start Expo app
+# Start Expo app (choose one)
 cd mobile
+
+# Option 1: Expo Go (quick testing)
 npx expo start
+
+# Option 2: Development build (recommended for native features)
+npx expo prebuild --platform android
+npx expo run:android
 ```
 
 3. **Populate database** (one-time setup)
@@ -220,10 +221,6 @@ Matches a drawn sketch with animal photos.
 ### `GET /health`
 
 System health and model status.
-
-### `GET /database-stats`
-
-Animal photo counts by category.
 
 ## 🎯 Key Features
 
