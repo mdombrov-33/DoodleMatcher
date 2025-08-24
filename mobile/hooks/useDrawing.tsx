@@ -55,7 +55,7 @@ export function useDrawing() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              image: base64, // The PNG as base64 string
+              image_data: base64, // The PNG as base64 string
             }),
           });
 
