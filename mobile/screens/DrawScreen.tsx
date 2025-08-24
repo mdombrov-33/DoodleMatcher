@@ -1,5 +1,5 @@
-import CanvasComponent from "@/components/CanvasComponent";
+import DrawingCanvas from "@/components/canvas/CanvasComponent";
 
 export default function DrawScreen() {
-  return <CanvasComponent />;
+  return <DrawingCanvas />;
 }

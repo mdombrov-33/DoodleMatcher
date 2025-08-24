@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { View, Text, PanResponder, Pressable, StyleSheet } from "react-native";
 import { Canvas, Line, useCanvasRef } from "@shopify/react-native-skia";
 import { Point, Stroke } from "@/types/canvas";
+import ActionButton from "./ActionButton";
 
-function CanvasComponent() {
+export default function DrawingCanvas() {
   const canvasRef = useCanvasRef();
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
@@ -102,23 +103,8 @@ function CanvasComponent() {
 
       {/* Button Container */}
       <View className="flex-row justify-center items-center py-5 px-5 gap-4 bg-surface">
-        <Pressable
-          className="px-6 py-3 rounded-lg bg-secondary active:opacity-80 active:scale-95 min-w-[100]"
-          onPress={handleClear}
-        >
-          <Text className="text-white font-semibold text-base text-center">
-            Clear
-          </Text>
-        </Pressable>
-
-        <Pressable
-          className="px-6 py-3 rounded-lg bg-primary active:opacity-80 active:scale-95 min-w-[100]"
-          onPress={handleSave}
-        >
-          <Text className="text-white font-semibold text-base text-center">
-            Search
-          </Text>
-        </Pressable>
+        <ActionButton title="Clear" onPress={handleClear} variant="secondary" />
+        <ActionButton title="Search" onPress={handleSave} />
       </View>
     </View>
   );
@@ -136,5 +122,3 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
 });
-
-export default CanvasComponent;
