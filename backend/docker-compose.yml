@@ -1,3 +1,5 @@
+name: doodlematcher
+
 services:
   backend:
     build:
