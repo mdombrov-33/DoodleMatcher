@@ -16,11 +16,7 @@ export default function Results({ resetSearch, matches }: Props) {
           <ResultCard key={index} match={match} />
         ))}
       </ScrollView>
-      <ActionButton
-        title="Draw Again"
-        variant="primary"
-        onPress={resetSearch}
-      />
+      <ActionButton title="Go Back" variant="primary" onPress={resetSearch} />
     </View>
   );
 }
