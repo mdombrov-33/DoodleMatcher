@@ -1,10 +1,25 @@
+"""
+Purpose:
+    - Provide Qdrant client and utility functions for storing and searching image embeddings
+    - Handle collection creation and similarity search
+    - Centralized service for other scripts to interact with Qdrant
+
+Usage:
+    from services.qdrant_service import (
+        client,
+        COLLECTION_NAME,
+        create_collection_if_not_exists,
+        search_similar_images
+    )
+"""
+
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams
 import numpy as np
 from typing import List, Tuple
 
 # Initialize Qdrant client
-client = QdrantClient(url="http://localhost:6333")  # Change for production
+client = QdrantClient(url="http://localhost:6333")  # Change URL for production
 COLLECTION_NAME = "animal_photos"
 
 
@@ -12,7 +27,7 @@ def search_similar_images(
     embedding: np.ndarray, limit: int = 3
 ) -> List[Tuple[str, float, str]]:
     """
-    Search for similar images in Qdrant
+    Search for images similar to the given embedding in Qdrant.
 
     Args:
         embedding: CLIP embedding vector
@@ -22,7 +37,6 @@ def search_similar_images(
         List of (photo_url, similarity_score, animal_type) tuples
     """
     try:
-        # Search in Qdrant
         search_results = client.search(
             collection_name=COLLECTION_NAME,
             query_vector=embedding.tolist(),
@@ -36,8 +50,7 @@ def search_similar_images(
                 photo_url = result.payload.get("photo_url", "")
                 animal_type = result.payload.get("animal_type", "unknown")
                 similarity_score = result.score
-
-            results.append((photo_url, similarity_score, animal_type))
+                results.append((photo_url, similarity_score, animal_type))
 
         return results
 
@@ -47,7 +60,11 @@ def search_similar_images(
 
 
 def create_collection_if_not_exists():
-    """Create the animal photos collection if it doesn't exist"""
+    """
+    Create the animal_photos collection if it doesn't exist.
+
+    Uses 512-D vectors and cosine distance for embeddings.
+    """
     try:
         collections = client.get_collections()
         collection_names = [col.name for col in collections.collections]
