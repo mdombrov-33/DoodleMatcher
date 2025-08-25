@@ -1,7 +1,7 @@
 import { Point, Stroke } from "@/types/canvas";
 import { Line, useCanvasRef } from "@shopify/react-native-skia";
 import React, { useState } from "react";
-import { PanResponder } from "react-native";
+import { Alert, PanResponder } from "react-native";
 
 export function useDrawing() {
   const canvasRef = useCanvasRef();
@@ -42,6 +42,12 @@ export function useDrawing() {
   };
 
   const handleSave = async () => {
+    if (strokes.length === 0) {
+      Alert.alert(
+        "There is nothing on canvas",
+        "Please draw something before searching."
+      );
+    }
     if (canvasRef.current) {
       try {
         const image = canvasRef.current.makeImageSnapshot();
