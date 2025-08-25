@@ -64,7 +64,6 @@ The app has three main states on a single screen:
 ### 2. Loading State
 
 - Embedding generation in progress
-- Cancel option available
 
 ### 3. Results State
 
