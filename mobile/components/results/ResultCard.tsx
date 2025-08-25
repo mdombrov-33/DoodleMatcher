@@ -1,9 +1,14 @@
+import { Match } from "@/types/canvas";
 import { Text, View } from "react-native";
 
-export default function ResultCard() {
+type Props = {
+  match: Match;
+};
+
+export default function ResultCard({ match }: Props) {
   return (
     <View>
-      <Text>Result Card</Text>
+      <Text>{match.photo_url}</Text>
     </View>
   );
 }

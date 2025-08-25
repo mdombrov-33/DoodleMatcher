@@ -19,7 +19,7 @@ export default function DrawingCanvas() {
   } = useDrawing();
 
   if (matches.length > 0) {
-    return <Results resetSearch={resetSearch} />;
+    return <Results matches={matches} resetSearch={resetSearch} />;
   }
 
   return (
