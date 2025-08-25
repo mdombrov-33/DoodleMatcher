@@ -25,7 +25,7 @@ COLLECTION_NAME = "animal_photos"
 
 def search_similar_images(
     embedding: np.ndarray, limit: int = 3
-) -> List[Tuple[str, float, str]]:
+) -> List[Tuple[str, float, str, str]]:
     """
     Search for images similar to the given embedding in Qdrant.
 
@@ -49,8 +49,9 @@ def search_similar_images(
             if result.payload is not None:
                 photo_url = result.payload.get("photo_url", "")
                 animal_type = result.payload.get("animal_type", "unknown")
+                photographer = result.payload.get("photographer", "unknown")
                 similarity_score = result.score
-                results.append((photo_url, similarity_score, animal_type))
+                results.append((photo_url, similarity_score, animal_type, photographer))
 
         return results
 

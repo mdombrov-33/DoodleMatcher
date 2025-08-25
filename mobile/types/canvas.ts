@@ -11,6 +11,7 @@ export type Match = {
   animal_type: string;
   confidence: number;
   photo_url: string;
+  photographer: string;
 };
 
 export type SearchResult = {

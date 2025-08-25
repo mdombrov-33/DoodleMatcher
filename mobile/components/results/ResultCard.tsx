@@ -15,8 +15,13 @@ export default function ResultCard({ match }: Props) {
       />
 
       {/* Animal Type */}
-      <Text className="text-text font-bold text-lg mb-1">
+      <Text className="text-text font-bold text-lg mb-1 capitalize">
         {match.animal_type}
+      </Text>
+
+      {/* Photographer */}
+      <Text className="text-textMuted text-sm">
+        Photo by: {match.photographer}
       </Text>
 
       {/* Confidence Bar */}

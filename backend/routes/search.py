@@ -43,7 +43,7 @@ async def search_doodle(request: SearchRequest):
 
         # 5. Convert similarity scores to confidence percentages
         matches = []
-        for photo_url, similarity, animal_type in search_results:
+        for photo_url, similarity, animal_type, photographer in search_results:
             # Convert cosine similarity (-1 to 1) to confidence (0-100%)
             confidence = max(0, min(100, (similarity + 1) * 50))
             matches.append(
@@ -51,6 +51,7 @@ async def search_doodle(request: SearchRequest):
                     photo_url=photo_url,
                     confidence=round(confidence, 1),
                     animal_type=animal_type,
+                    photographer=photographer,
                 )
             )
 

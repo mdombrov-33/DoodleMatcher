@@ -10,6 +10,7 @@ class MatchResult(BaseModel):
     photo_url: str
     confidence: float
     animal_type: str
+    photographer: str
 
 
 class SearchResponse(BaseModel):
