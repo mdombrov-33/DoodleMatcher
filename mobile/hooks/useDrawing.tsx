@@ -1,4 +1,4 @@
-import { Point, Stroke } from "@/types/canvas";
+import { Match, Point, SearchResult, Stroke } from "@/types/canvas";
 import { Line, useCanvasRef } from "@shopify/react-native-skia";
 import React, { useState } from "react";
 import { Alert, PanResponder } from "react-native";
@@ -9,6 +9,7 @@ export function useDrawing() {
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [matches, setMatches] = useState<Match[]>([]);
 
   //! PanResponder to track finger drawing
   const panResponder = PanResponder.create({
@@ -36,6 +37,11 @@ export function useDrawing() {
     },
   });
 
+  //! Reset search results
+  const resetSearch = () => {
+    setMatches([]);
+  };
+
   //! Clear canvas
   const handleClear = () => {
     setStrokes([]);
@@ -53,7 +59,7 @@ export function useDrawing() {
   };
 
   //! Send base64 image to backend and get matches
-  const searchDoodle = async (base64: string) => {
+  const searchDoodle = async (base64: string): Promise<SearchResult | null> => {
     setIsLoading(true);
     try {
       //* If using Android Studio emulator
@@ -92,9 +98,9 @@ export function useDrawing() {
 
     console.log("Drawing captured, length:", base64.length);
 
-    const matches = await searchDoodle(base64);
-    console.log("Matches received:", matches);
-    return matches;
+    const result = await searchDoodle(base64);
+    setMatches(result?.matches || []);
+    console.log("Matches received:", result);
   };
 
   //! Render a stroke as a series of lines
@@ -125,5 +131,7 @@ export function useDrawing() {
     currentStroke,
     renderStroke,
     isLoading,
+    matches,
+    resetSearch,
   };
 }

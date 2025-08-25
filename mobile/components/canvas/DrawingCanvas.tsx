@@ -1,7 +1,8 @@
 import { View } from "react-native";
-import ActionButton from "@/components/canvas/ActionButton";
+import ActionButton from "@/components/ActionButton";
 import SketchArea from "@/components/canvas/SketchArea";
 import { useDrawing } from "@/hooks/useDrawing";
+import Results from "@/components/results/Results";
 
 export default function DrawingCanvas() {
   const {
@@ -13,7 +14,13 @@ export default function DrawingCanvas() {
     handleClear,
     handleSearch,
     isLoading,
+    matches,
+    resetSearch,
   } = useDrawing();
+
+  if (matches.length > 0) {
+    return <Results resetSearch={resetSearch} />;
+  }
 
   return (
     <View className="flex-1 bg-background">
