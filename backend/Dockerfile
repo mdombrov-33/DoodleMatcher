@@ -14,7 +14,6 @@ RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
 
-
 # Copy all backend source code into container
 COPY . /app
 
