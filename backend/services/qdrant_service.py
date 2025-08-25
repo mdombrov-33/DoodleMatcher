@@ -19,7 +19,7 @@ import numpy as np
 from typing import List, Tuple
 
 # Initialize Qdrant client
-client = QdrantClient(url="http://localhost:6333")  # Change URL for production
+client = QdrantClient(url="http://qdrant:6333")  # Change URL for production
 COLLECTION_NAME = "animal_photos"
 
 

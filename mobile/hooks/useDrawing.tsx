@@ -49,11 +49,14 @@ export function useDrawing() {
           const base64 = image.encodeToBase64();
           console.log("Drawing saved, length:", base64?.length);
 
-          const response = await fetch("http://localhost:8000/search-doodle", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image_data: base64 }),
-          });
+          const response = await fetch(
+            "http://10.0.2.2:8000/api/search-doodle",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ image_data: base64 }),
+            }
+          );
 
           const matches = await response.json();
           console.log("Matches received:", matches);
