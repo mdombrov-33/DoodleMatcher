@@ -11,6 +11,8 @@ from services.qdrant_service import (
     create_collection_if_not_exists,
 )
 from constants.animals_list import ANIMALS
+import uuid
+from qdrant_client.models import PointStruct
 
 UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")
 
@@ -61,25 +63,36 @@ def get_unsplash_photos(animal: str, count: int = 15) -> list[dict]:
 
 
 def process_and_store_photo(photo_data: dict) -> bool:
-    """Download photo, generate embedding, and insert into Qdrant."""
+    """
+    Download photo, generate embedding, and insert into Qdrant.
+    IDs are converted to UUID to satisfy Qdrant requirements.
+    """
     print(
         f"Processing {photo_data['animal_type']} photo: {photo_data['id']} url: {photo_data['url']}"
     )
 
-    image = download_image(photo_data["url"])
-    if not image:
+    # --- Download image ---
+    try:
+        image = Image.open(
+            io.BytesIO(requests.get(photo_data["url"], timeout=10).content)
+        )
+        image = image.convert("RGB")
+    except Exception as e:
+        print(f"Failed to download image: {e}")
         return False
 
+    # --- Generate embedding ---
     embedding = get_image_embedding(image)
     if embedding is None:
         print("Failed to generate embedding")
         return False
 
+    # --- Create Qdrant point ---
     try:
-        from qdrant_client.models import PointStruct
-
         point = PointStruct(
-            id=photo_data["id"],
+            id=str(
+                uuid.uuid5(uuid.NAMESPACE_URL, photo_data["id"])
+            ),  # deterministic UUID
             vector=embedding.tolist(),
             payload={
                 "photo_url": photo_data["url"],
@@ -91,6 +104,7 @@ def process_and_store_photo(photo_data: dict) -> bool:
         client.upsert(collection_name=COLLECTION_NAME, points=[point])
         print(f"Stored {photo_data['animal_type']} photo in Qdrant")
         return True
+
     except Exception as e:
         print(f"Failed to store in Qdrant: {e}")
         return False
