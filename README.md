@@ -1,6 +1,12 @@
 # 🎨 Doodle Matcher
 
-A mobile app that matches your animal sketches with real photos using AI-powered vector search. Draw a cat, get matched with actual cat photos ranked by similarity!
+A mobile app that matches your animal sketches with real photos using AI-powered vector search. Draw an animal, get matched with actual animal photos ranked by similarity!
+
+## 🎬 Demo
+
+<p align="center">
+  <img src="doodle-cat.gif" alt="Doodle Matcher Demo" width="400"/>
+</p>
 
 ## ✨ How It Works
 
