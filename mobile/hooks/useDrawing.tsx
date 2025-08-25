@@ -49,8 +49,13 @@ export function useDrawing() {
           const base64 = image.encodeToBase64();
           console.log("Drawing saved, length:", base64?.length);
 
+          //! If using Android Studio emulator
+          // "http://10.0.2.2:8000/api/search-doodle",
+          //! If using Windows
+          // "http://localhost:8000/api/search-doodle",
+          //! If using WSL 2
           const response = await fetch(
-            "http://10.0.2.2:8000/api/search-doodle",
+            "http://192.168.1.179:8000/api/search-doodle",
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
