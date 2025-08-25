@@ -81,6 +81,23 @@ The app has three main states on a single screen:
 
 **Why Top-K Search?** Qdrant's vector search returns ranked results, showcasing the power of similarity scoring in real-time.
 
+## ⚠️ Technical Challenges & Solutions
+
+1. **Continuous Drawing Performance**  
+   Implementing smooth finger drawing with Skia required careful `PanResponder` handling and optimized stroke rendering. Managing multiple stroke states while maintaining 60fps was critical.
+
+2. **Model Size Optimization**  
+   Initial PyTorch CLIP implementation resulted in ~27GB model weights, making local development impractical. Switched to ONNX Runtime for 10x size reduction and faster inference.
+
+3. **Offline CLIP Inference**  
+   Not all CLIP models are available through Hugging Face Inference API. Downloaded and optimized local ONNX model to ensure reliable, low-latency embeddings without cloud dependencies.
+
+4. **Unsplash Integration Complexity**  
+   API rate limits, inconsistent payload structures, and URL format variations required multiple iterations to achieve reliable dataset population and development workflow.
+
+5. **Production Model Deployment**  
+   Balancing model performance, memory usage, and deployment complexity led to containerized ONNX runtime solution with optimized inference pipelines.
+
 ## ⚙️ Environment Variables
 
 Create a `.env` file in the backend directory with the following variables:
