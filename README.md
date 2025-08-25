@@ -64,6 +64,7 @@ The app has three main states on a single screen:
 ### 2. Loading State
 
 - Embedding generation in progress
+- Cancel option available
 
 ### 3. Results State
 
@@ -83,19 +84,19 @@ The app has three main states on a single screen:
 ## ⚠️ Technical Challenges & Solutions
 
 1. **Continuous Drawing Performance**  
-   Implementing smooth finger drawing with Skia required careful `PanResponder` handling and optimized stroke rendering. Managing multiple stroke states while maintaining 60fps was critical.
+   Implementing smooth finger drawing with Skia required careful `PanResponder` handling and optimized stroke rendering. Managing multiple stroke states while maintaining stable performance and correct render view is a challenge.
 
 2. **Model Size Optimization**  
    Initial PyTorch CLIP implementation resulted in ~27GB model weights, making local development impractical. Switched to ONNX Runtime for 10x size reduction and faster inference.
 
-3. **Offline CLIP Inference**  
-   Not all CLIP models are available through Hugging Face Inference API. Downloaded and optimized local ONNX model to ensure reliable, low-latency embeddings without cloud dependencies.
+3. **Hugging Face Transformers Limitations**  
+   Not all CLIP models are exposed through the Hugging Face Inference API. Some models required direct download and local execution to enable reliable embedding generation.
 
 4. **Unsplash Integration Complexity**  
    API rate limits, inconsistent payload structures, and URL format variations required multiple iterations to achieve reliable dataset population and development workflow.
 
-5. **Production Model Deployment**  
-   Balancing model performance, memory usage, and deployment complexity led to containerized ONNX runtime solution with optimized inference pipelines.
+5. **Decision to Run Local CLIP Model**  
+   To maintain full control over embeddings, improve latency, and avoid cloud inference limits, a local CLIP model download was required. This added extra setup complexity but solved reliability and cost issues.
 
 ## ⚙️ Environment Variables
 
