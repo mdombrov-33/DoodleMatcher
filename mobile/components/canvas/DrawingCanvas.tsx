@@ -12,6 +12,7 @@ export default function DrawingCanvas() {
     currentStroke,
     handleClear,
     handleSearch,
+    isLoading,
   } = useDrawing();
 
   return (
@@ -27,7 +28,10 @@ export default function DrawingCanvas() {
       {/* Button Container */}
       <View className="flex-row justify-center items-center py-5 px-5 gap-4 bg-surface">
         <ActionButton title="Clear" onPress={handleClear} variant="secondary" />
-        <ActionButton title="Search" onPress={handleSearch} />
+        <ActionButton
+          title={isLoading ? "Searching..." : "Search"}
+          onPress={handleSearch}
+        />
       </View>
     </View>
   );

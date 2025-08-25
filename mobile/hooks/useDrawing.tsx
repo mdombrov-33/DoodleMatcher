@@ -8,6 +8,7 @@ export function useDrawing() {
   const [strokes, setStrokes] = useState<Stroke[]>([]);
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   //! PanResponder to track finger drawing
   const panResponder = PanResponder.create({
@@ -53,6 +54,7 @@ export function useDrawing() {
 
   //! Send base64 image to backend and get matches
   const searchDoodle = async (base64: string) => {
+    setIsLoading(true);
     try {
       //* If using Android Studio emulator
       // const url = "http://10.0.2.2:8000/api/search-doodle";
@@ -70,6 +72,8 @@ export function useDrawing() {
     } catch (error) {
       console.error("Error during search:", error);
       return null;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -120,5 +124,6 @@ export function useDrawing() {
     canvasRef,
     currentStroke,
     renderStroke,
+    isLoading,
   };
 }
