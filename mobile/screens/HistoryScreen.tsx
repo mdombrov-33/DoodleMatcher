@@ -1,9 +1,5 @@
-import { Text, View } from "react-native";
+import DrawingHistory from "@/components/history/DrawingHistory";
 
 export default function HistoryScreen() {
-  return (
-    <View>
-      <Text className="text-3xl">History</Text>
-    </View>
-  );
+  return <DrawingHistory />;
 }

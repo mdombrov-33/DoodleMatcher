@@ -2,6 +2,7 @@ import { Match, Point, SearchResult, Stroke } from "@/types/canvas";
 import { Line, useCanvasRef } from "@shopify/react-native-skia";
 import React, { useState } from "react";
 import { Alert, PanResponder } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export function useDrawing() {
   const canvasRef = useCanvasRef();
@@ -58,6 +59,26 @@ export function useDrawing() {
     return image.encodeToBase64();
   };
 
+  //! Save canvas snapshot to async storage
+  const saveToHistory = async (canvas: string, result: string) => {
+    try {
+      const history = await AsyncStorage.getItem("drawingHistory");
+      const updatedHistory = history ? JSON.parse(history) : [];
+      updatedHistory.unshift({
+        canvas,
+        result,
+        timestamp: Date.now(),
+        id: Date.now().toString(),
+      });
+      await AsyncStorage.setItem(
+        "drawingHistory",
+        JSON.stringify(updatedHistory)
+      );
+    } catch (error) {
+      console.error("Error saving to history:", error);
+    }
+  };
+
   //! Send base64 image to backend and get matches
   const searchDoodle = async (base64: string): Promise<SearchResult | null> => {
     setIsLoading(true);
@@ -110,6 +131,7 @@ export function useDrawing() {
 
     const result = await searchDoodle(base64);
     setMatches(result?.matches || []);
+    saveToHistory(base64, result?.matches?.[0]?.photo_url || "");
     console.log("Matches received:", result);
   };
 
