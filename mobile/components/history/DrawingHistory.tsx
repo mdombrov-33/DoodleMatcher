@@ -23,10 +23,10 @@ export default function DrawingHistory() {
       data={history}
       keyExtractor={(item, idx) => item.id || idx.toString()}
       renderItem={({ item }) => (
-        <View className="flex-row items-center m-2 p-2 bg-surface rounded-lg border border-border">
+        <View className="flex-row items-center m-2 p-2 bg-surface rounded-lg border border-border justify-between">
           <Image
             source={{ uri: `data:image/png;base64,${item.canvas}` }}
-            className="w-32 h-32 mr-36 rounded bg-background"
+            className="w-32 h-32 rounded bg-background"
           />
           <Image
             source={{ uri: item.result }}
