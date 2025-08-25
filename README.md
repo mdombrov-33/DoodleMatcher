@@ -42,7 +42,7 @@ User Drawing → CLIP Embeddings → Vector Search → Top 3 Matches
 ### Backend (API)
 
 - **FastAPI** - High-performance async Python API
-- **Hugging Face Transformers** - CLIP model for embeddings
+- **ONNX Runtime** - Optimized CLIP model inference
 - **Qdrant** - Vector database for similarity search
 - **Pillow** - Image processing and optimization
 
@@ -81,31 +81,16 @@ The app has three main states on a single screen:
 
 **Why Top-K Search?** Qdrant's vector search returns ranked results, showcasing the power of similarity scoring in real-time.
 
-## 🗂️ Project Structure
+## ⚙️ Environment Variables
 
+Create a `.env` file in the backend directory with the following variables:
+
+```env
+# Required for populating database with animal photos
+UNSPLASH_API_KEY=your_unsplash_access_key
 ```
-doodle-matcher/
-├── mobile/                     # Expo React Native app
-│   ├── app/(tabs)/
-│   │   ├── index.tsx          # Main draw/search/results screen
-│   │   └── history.tsx        # Past drawings and matches
-│   ├── components/
-│   │   ├── DrawingCanvas.tsx  # SVG-based drawing component
-│   │   └── ResultsDisplay.tsx # Top 3 results with scores
-│   └── services/
-│       └── api.ts             # Backend API integration
-├── backend/                    # FastAPI application
-│   ├── main.py                # API routes and endpoints
-│   ├── services/
-│   │   ├── embeddings.py      # CLIP model integration
-│   │   ├── qdrant_client.py   # Vector DB operations
-│   │   └── image_processing.py # PNG preprocessing
-│   └── models/
-│       └── api_models.py      # Pydantic request/response models
-├── scripts/
-│   └── populate_database.py   # Dataset setup (300+ animal photos)
-└── railway.toml               # Deployment configuration
-```
+
+**Note**: Free-tier Unsplash has API rate limits—avoid making bulk requests too quickly when populating the database.
 
 ## 🛠️ Setup & Development
 
@@ -114,6 +99,7 @@ doodle-matcher/
 - Node.js 18+ and npm/yarn
 - Python 3.10+ with Poetry
 - Expo CLI (`npm install -g @expo/cli`)
+- Docker and Docker Compose
 
 ### Local Development
 
@@ -126,35 +112,61 @@ cd DoodleMatcher
 # Backend
 cd backend
 poetry install
-poetry shell
 
 # Frontend
 cd ../mobile
 npm install
 ```
 
-2. **Start local services**
+2. **Download CLIP ONNX Model**
 
 ```bash
-# Start all backend services with Docker Compose
-docker-compose up
-
-# Start Expo app (choose one)
-cd mobile
-
-# Option 1: Expo Go (quick testing)
-npx expo start
-
-# Option 2: Development build (recommended for native features)
-npx expo prebuild --platform android
-npx expo run:android
+cd backend/models/clip
+wget https://huggingface.co/Qdrant/clip-ViT-B-32-vision/resolve/main/model.onnx -O clip-ViT-B-32-vision.onnx
 ```
 
-3. **Populate database** (one-time setup)
+3. **Set up environment variables**
 
 ```bash
-cd scripts
-python populate_database.py
+cd backend
+cp .env.example .env
+# Edit .env with your Unsplash API key
+```
+
+4. **Start local services**
+
+```bash
+# Start all services (Qdrant + FastAPI backend) with Docker Compose
+docker-compose up
+
+# Start Expo app (in new terminal)
+cd mobile
+npx expo start
+```
+
+5. **Populate database** (one-time setup)
+
+```bash
+cd backend
+poetry run python -m scripts.populate_qdrant
+```
+
+### Key Dependencies
+
+**Backend Python packages** (installed via Poetry):
+
+- `onnxruntime` - ONNX model inference
+- `numpy` - Numerical computations
+- `Pillow` - Image processing
+- `fastapi` - Web API framework
+- `pydantic` - Data validation
+- `qdrant-client` - Vector database client
+
+**GPU Acceleration** (optional): For faster inference, install ONNX Runtime with CUDA support separately:
+
+```bash
+pip install onnxruntime-gpu
+# Then modify providers=["CUDAExecutionProvider"] in embeddings.py
 ```
 
 ## 🚀 Deployment
@@ -172,18 +184,22 @@ python populate_database.py
    - Connect GitHub repository
    - Set environment variables:
      ```
-     QDRANT_URL=your-qdrant-internal-url
      UNSPLASH_API_KEY=your-unsplash-key
      ```
    - Deploy from `/backend` directory
 
-3. **Populate production database**
+3. **Upload CLIP model to production**
+
+   Ensure the ONNX model is available in your deployment environment.
+
+4. **Populate production database**
 
    ```bash
-   python scripts/populate_database.py --production
+   cd backend
+   poetry run python -m scripts.populate_qdrant
    ```
 
-4. **Build mobile app**
+5. **Build mobile app**
    ```bash
    cd mobile
    eas build --platform all
@@ -220,7 +236,7 @@ Matches a drawn sketch with animal photos.
 
 ### `GET /health`
 
-System health and model status.
+System health and model status. Use this endpoint to verify backend and CLIP model readiness.
 
 ## 🎯 Key Features
 
@@ -240,7 +256,7 @@ System health and model status.
 ## 🛠️ Tech Highlights
 
 - **React Native + Expo** for cross-platform mobile development
-- **Hugging Face Transformers** integration in production
+- **ONNX Runtime** integration for optimized AI inference
 - **Vector database operations** with real-time similarity search
 - **Cross-modal AI** bridging sketches and photographs
 
