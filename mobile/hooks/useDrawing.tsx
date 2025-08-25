@@ -9,6 +9,7 @@ export function useDrawing() {
   const [currentStroke, setCurrentStroke] = useState<Point[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
 
+  //! PanResponder to track finger drawing
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
     onMoveShouldSetPanResponder: () => true,
@@ -34,6 +35,7 @@ export function useDrawing() {
     },
   });
 
+  //! Clear canvas
   const handleClear = () => {
     setStrokes([]);
     setCurrentStroke([]);
@@ -41,44 +43,57 @@ export function useDrawing() {
     console.log("Canvas cleared");
   };
 
-  const handleSave = async () => {
+  //! Capture canvas as base64 string
+  const captureCanvas = (): string | null => {
+    if (!canvasRef.current) return null;
+    const image = canvasRef.current.makeImageSnapshot();
+    if (!image) return null;
+    return image.encodeToBase64();
+  };
+
+  //! Send base64 image to backend and get matches
+  const searchDoodle = async (base64: string) => {
+    try {
+      //* If using Android Studio emulator
+      // const url = "http://10.0.2.2:8000/api/search-doodle";
+      //* If using Windows
+      // const url = "http://localhost:8000/api/search-doodle";
+      //* If using WSL 2
+      const url = "http://192.168.1.179:8000/api/search-doodle";
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_data: base64 }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error("Error during search:", error);
+      return null;
+    }
+  };
+
+  //! Validate canvas and perform search
+  const handleSearch = async () => {
     if (strokes.length === 0) {
       Alert.alert(
         "There is nothing on canvas",
         "Please draw something before searching."
       );
+      return null;
     }
-    if (canvasRef.current) {
-      try {
-        const image = canvasRef.current.makeImageSnapshot();
-        if (image) {
-          const base64 = image.encodeToBase64();
-          console.log("Drawing saved, length:", base64?.length);
 
-          //! If using Android Studio emulator
-          // "http://10.0.2.2:8000/api/search-doodle",
-          //! If using Windows
-          // "http://localhost:8000/api/search-doodle",
-          //! If using WSL 2
-          const response = await fetch(
-            "http://192.168.1.179:8000/api/search-doodle",
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ image_data: base64 }),
-            }
-          );
+    const base64 = captureCanvas();
+    if (!base64) return null;
 
-          const matches = await response.json();
-          console.log("Matches received:", matches);
-          return matches;
-        }
-      } catch (error) {
-        console.error("Error during save/search:", error);
-      }
-    }
+    console.log("Drawing captured, length:", base64.length);
+
+    const matches = await searchDoodle(base64);
+    console.log("Matches received:", matches);
+    return matches;
   };
 
+  //! Render a stroke as a series of lines
   const renderStroke = (points: Point[], key: string | number) => {
     if (points.length < 2) return null;
     return (
@@ -100,7 +115,7 @@ export function useDrawing() {
   return {
     strokes,
     panResponder,
-    handleSave,
+    handleSearch,
     handleClear,
     canvasRef,
     currentStroke,
