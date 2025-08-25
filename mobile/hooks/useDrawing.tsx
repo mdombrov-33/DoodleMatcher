@@ -63,17 +63,25 @@ export function useDrawing() {
     setIsLoading(true);
     try {
       //* If using Android Studio emulator
-      // const url = "http://10.0.2.2:8000/api/search-doodle";
+      const url = "http://10.0.2.2:8000/api/search-doodle";
       //* If using Windows
       // const url = "http://localhost:8000/api/search-doodle";
       //* If using WSL 2
-      const url = "http://192.168.1.179:8000/api/search-doodle";
+      // const url = "http://192.168.1.179:8000/api/search-doodle";
 
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ image_data: base64 }),
       });
+      if (!response.ok) {
+        Alert.alert(
+          "Search Error",
+          "Unable to connect to search service. Please try again."
+        );
+        console.error("Server error:", response.statusText);
+        return null;
+      }
       return await response.json();
     } catch (error) {
       console.error("Error during search:", error);
@@ -85,6 +93,8 @@ export function useDrawing() {
 
   //! Validate canvas and perform search
   const handleSearch = async () => {
+    if (isLoading) return;
+
     if (strokes.length === 0) {
       Alert.alert(
         "There is nothing on canvas",
