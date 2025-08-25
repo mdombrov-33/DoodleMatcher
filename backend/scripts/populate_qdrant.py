@@ -20,7 +20,7 @@ def download_image(url: str) -> Image.Image | None:
     try:
         resp = requests.get(url, timeout=10)
         if resp.status_code == 200:
-            return Image.open(io.BytesIO(resp.content)).convert("RGB")
+            return Image.open(io.BytesIO(resp.content))
         print(f"Failed to download {url}, status: {resp.status_code}")
     except Exception as e:
         print(f"Exception downloading {url}: {e}")
@@ -69,9 +69,6 @@ def process_and_store_photo(photo_data: dict) -> bool:
     image = download_image(photo_data["url"])
     if not image:
         return False
-
-    # Resize for consistency
-    image = image.resize((224, 224))
 
     embedding = get_image_embedding(image)
     if embedding is None:
