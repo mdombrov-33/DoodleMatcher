@@ -250,7 +250,8 @@ Matches a drawn sketch with animal photos.
     {
       "photo_url": "https://images.unsplash.com/...",
       "confidence": 94.2,
-      "animal_type": "cat"
+      "animal_type": "cat",
+      "photographer": "John Doe"
     }
   ],
   "search_time_ms": 156
