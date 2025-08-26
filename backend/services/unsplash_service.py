@@ -10,8 +10,9 @@ Usage:
 
 import os
 import requests
-from PIL import Image
 import io
+from PIL import Image
+from utils.exceptions import UnsplashServiceError
 
 UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")
 
@@ -34,8 +35,7 @@ def get_unsplash_photos(animal: str, count: int = 100) -> list[dict]:
         }
     """
     if not UNSPLASH_API_KEY:
-        print("[WARNING] UNSPLASH_API_KEY not set")
-        return []
+        raise UnsplashServiceError("Unsplash API key not set in environment variables.")
 
     url = "https://api.unsplash.com/search/photos"
     photos = []
@@ -69,8 +69,7 @@ def get_unsplash_photos(animal: str, count: int = 100) -> list[dict]:
             page += 1
         return photos[:count]
     except Exception as e:
-        print(f"[ERROR] Unsplash API fetch failed: {e}")
-        return []
+        raise UnsplashServiceError(f"Error fetching photos from Unsplash: {e}")
 
 
 def download_image(url: str) -> Image.Image | None:
@@ -88,5 +87,4 @@ def download_image(url: str) -> Image.Image | None:
         resp.raise_for_status()
         return Image.open(io.BytesIO(resp.content))
     except Exception as e:
-        print(f"[ERROR] Failed to download image {url}: {e}")
-        return None
+        raise UnsplashServiceError(f"Error downloading image from {url}: {e}")

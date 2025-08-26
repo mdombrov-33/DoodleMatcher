@@ -19,6 +19,7 @@ import os
 from qdrant_client.models import Distance, VectorParams
 import numpy as np
 from typing import List, Tuple
+from utils.exceptions import QdrantServiceError
 
 
 #! Qdrant Client Configuration
@@ -85,8 +86,7 @@ def search_similar_images(
         return results
 
     except Exception as e:
-        print(f"Qdrant search error: {e}")
-        return []
+        raise QdrantServiceError(f"Error searching similar images: {e}")
 
 
 def create_collection_if_not_exists():
@@ -112,4 +112,4 @@ def create_collection_if_not_exists():
             print(f"Collection {COLLECTION_NAME} already exists")
 
     except Exception as e:
-        print(f"Error creating collection: {e}")
+        raise QdrantServiceError(f"Error creating collection: {e}")

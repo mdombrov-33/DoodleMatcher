@@ -13,6 +13,7 @@ from pathlib import Path
 from PIL import Image
 import numpy as np
 from services.clip_service import get_image_embedding
+from utils.logger import logger
 
 #! Add backend/ to sys.path for imports
 # Ensures we can import services.clip_service even if running from scripts/
@@ -25,7 +26,9 @@ sys.path.append(str(BACKEND_DIR))
 TEST_IMAGE_PATH = Path(__file__).resolve().parent / "test_cat.png"
 if not TEST_IMAGE_PATH.exists():
     raise FileNotFoundError(
-        f"[ERROR] Test image not found: {TEST_IMAGE_PATH}. Please place a PNG image here."
+        logger.error(
+            f"Test image not found: {TEST_IMAGE_PATH}. Please place a PNG image here."
+        )
     )
 
 #! Load the image
@@ -35,16 +38,16 @@ image = Image.open(TEST_IMAGE_PATH)
 embedding = get_image_embedding(image)
 
 if embedding is None:
-    print("[!] Embedding generation failed")
+    logger.error("Embedding generation failed")
 else:
     #! Log embedding details
-    print("[INFO] Embedding shape:", embedding.shape)
-    print("[INFO] Embedding dtype:", embedding.dtype)
+    logger.info(f"Embedding shape: {embedding.shape}")
+    logger.info(f"Embedding dtype: {embedding.dtype}")
     norm = np.linalg.norm(embedding)
-    print(f"[INFO] Embedding L2 norm: {norm:.4f}")
+    logger.info(f"Embedding L2 norm: {norm:.4f}")
 
     #! Sanity check: shape and normalization
     if embedding.shape == (512,) and np.isclose(norm, 1.0, atol=1e-3):
-        print("[OK] Embedding generated correctly and normalized")
+        logger.info("Embedding generated correctly and normalized")
     else:
-        print("[WARNING] Embedding shape or norm unexpected")
+        logger.warning("Embedding shape or norm unexpected")

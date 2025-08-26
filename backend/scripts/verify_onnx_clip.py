@@ -13,6 +13,7 @@ import sys
 from pathlib import Path
 import numpy as np
 import onnxruntime as ort
+from utils.logger import logger
 
 #! Model path setup
 # This resolves the path to the ONNX file relative to this script
@@ -25,10 +26,10 @@ MODEL_PATH = (
 def main():
     #! Check existence
     if not MODEL_PATH.exists():
-        print(f"[ERROR] Model not found: {MODEL_PATH}")
+        logger.error(f"Model not found: {MODEL_PATH}")
         sys.exit(1)
 
-    print(f"[INFO] Loading ONNX model: {MODEL_PATH}")
+    logger.info(f"Loading ONNX model: {MODEL_PATH}")
 
     #! Load ONNX model
     # Using CPUExecutionProvider for simplicity; GPU could be added if available
@@ -38,14 +39,14 @@ def main():
     inputs = sess.get_inputs()
     outputs = sess.get_outputs()
 
-    print("\n== Inputs ==")
+    logger.info("\n== Inputs ==")
     for i, inp in enumerate(inputs):
         # inp.shape may contain symbolic strings like 'batch_size', 'height', etc.
-        print(f"[{i}] name={inp.name} shape={inp.shape} dtype={inp.type}")
+        logger.info(f"[{i}] name={inp.name} shape={inp.shape} dtype={inp.type}")
 
-    print("\n== Outputs ==")
+    logger.info("\n== Outputs ==")
     for i, out in enumerate(outputs):
-        print(f"[{i}] name={out.name} shape={out.shape} dtype={out.type}")
+        logger.info(f"[{i}] name={out.name} shape={out.shape} dtype={out.type}")
 
     #! Prepare dummy input
     # We need concrete numeric dimensions for ONNXRuntime
@@ -70,16 +71,16 @@ def main():
     out_vals = sess.run(None, {inp.name: x})
     emb = out_vals[0]  # first output is image embeddings
 
-    print(f"\n[INFO] First output array shape: {emb.shape}, dtype: {emb.dtype}")
+    logger.info(f"First output array shape: {emb.shape}, dtype: {emb.dtype}")
 
     #! Sanity check
     if emb.ndim == 2 and emb.shape[1] == 512:
-        print("[OK] Output is 512-D per image. This looks like the CLIP image encoder.")
-    else:
-        print(f"[WARNING] Unexpected output shape. Wanted (1,512), got {emb.shape}.")
-        print(
-            "          This ONNX might not be the correct CLIP vision encoder export."
+        logger.info(
+            "Output is 512-D per image. This looks like the CLIP image encoder."
         )
+    else:
+        logger.warning(f"Unexpected output shape. Wanted (1,512), got {emb.shape}.")
+        logger.warning("This ONNX might not be the correct CLIP vision encoder export.")
 
     #! Optional: run again to confirm consistency
     emb2 = sess.run(None, {inp.name: x})[0]

@@ -13,6 +13,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 import onnxruntime as ort
+from utils.exceptions import ClipServiceError
 
 # Setup ONNX model path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,5 +81,4 @@ def get_image_embedding(image: Image.Image) -> np.ndarray:
         return embedding
 
     except Exception as e:
-        print(f"Error generating embedding: {e}")
-        return None
+        raise ClipServiceError(f"Error generating embedding: {e}")
