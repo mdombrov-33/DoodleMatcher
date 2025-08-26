@@ -208,6 +208,7 @@ pip install onnxruntime-gpu
    - Set environment variables:
      ```
      UNSPLASH_API_KEY=your-unsplash-key
+     QDRANT_HOST=localhost
      ```
    - Deploy from `/backend` directory
 
