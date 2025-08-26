@@ -86,7 +86,7 @@ def download_image(url: str) -> Image.Image | None:
     try:
         resp = requests.get(url, timeout=10)
         resp.raise_for_status()
-        return Image.open(io.BytesIO(resp.content)).convert("RGB")
+        return Image.open(io.BytesIO(resp.content))
     except Exception as e:
         print(f"[ERROR] Failed to download image {url}: {e}")
         return None
