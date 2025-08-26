@@ -8,6 +8,7 @@ Usage:
     poetry run python -m scripts.populate_qdrant
 """
 
+from dotenv import load_dotenv
 from services.clip_service import get_image_embedding
 from services.qdrant_service import (
     client,
@@ -19,6 +20,8 @@ from constants.animals_list import ANIMALS
 from qdrant_client.models import PointStruct
 import uuid
 import time
+
+load_dotenv()
 
 
 def process_and_store_photo(photo_data: dict) -> bool:

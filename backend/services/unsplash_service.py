@@ -16,7 +16,7 @@ import io
 UNSPLASH_API_KEY = os.getenv("UNSPLASH_API_KEY")
 
 
-def get_unsplash_photos(animal: str, count: int = 15) -> list[dict]:
+def get_unsplash_photos(animal: str, count: int = 100) -> list[dict]:
     """
     Query Unsplash API for images of a given animal.
 
@@ -38,25 +38,36 @@ def get_unsplash_photos(animal: str, count: int = 15) -> list[dict]:
         return []
 
     url = "https://api.unsplash.com/search/photos"
-    params = {
-        "query": f"{animal} animal",
-        "per_page": count,
-        "client_id": UNSPLASH_API_KEY,
-    }
-
+    photos = []
+    page = 1
+    per_page = 30  # Unsplash API max per_page
     try:
-        resp = requests.get(url, params=params, timeout=10)
-        resp.raise_for_status()
-        data = resp.json()
-        return [
-            {
-                "id": photo["id"],
-                "url": photo["urls"]["small"],
-                "animal_type": animal,
-                "photographer": photo["user"]["name"],
+        while len(photos) < count:
+            params = {
+                "query": f"{animal} animal",
+                "per_page": min(per_page, count - len(photos)),
+                "page": page,
+                "client_id": UNSPLASH_API_KEY,
             }
-            for photo in data.get("results", [])
-        ]
+            resp = requests.get(url, params=params, timeout=10)
+            resp.raise_for_status()
+            data = resp.json()
+            results = data.get("results", [])
+            if not results:
+                break
+            photos.extend(
+                [
+                    {
+                        "id": photo["id"],
+                        "url": photo["urls"]["small"],
+                        "animal_type": animal,
+                        "photographer": photo["user"]["name"],
+                    }
+                    for photo in results
+                ]
+            )
+            page += 1
+        return photos[:count]
     except Exception as e:
         print(f"[ERROR] Unsplash API fetch failed: {e}")
         return []
