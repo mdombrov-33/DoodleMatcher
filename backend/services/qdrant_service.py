@@ -15,19 +15,20 @@ Usage:
 
 from qdrant_client import QdrantClient
 
-# import os
+import os
 from qdrant_client.models import Distance, VectorParams
 import numpy as np
 from typing import List, Tuple
+
 # when using script to populate db
 # from dotenv import load_dotenv
 # load_dotenv()
-# QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
-# client = QdrantClient(url=f"http://{QDRANT_HOST}:6333")
 
+
+QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
 
 # Initialize Qdrant client
-client = QdrantClient(url=f"http://qdrant:6333")
+client = QdrantClient(url=f"http://{QDRANT_HOST}:6333")
 COLLECTION_NAME = "animal_photos"
 
 
