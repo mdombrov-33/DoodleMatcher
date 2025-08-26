@@ -20,10 +20,10 @@ from qdrant_client.models import Distance, VectorParams
 import numpy as np
 from typing import List, Tuple
 
-# when using script to populate db
+#! use this two lines when using script to populate local db
 # from dotenv import load_dotenv
-# load_dotenv()
 
+# load_dotenv()
 
 QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
 

@@ -14,8 +14,16 @@ RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
 
+# Download ONNX model at build time
+RUN mkdir -p models/clip && \
+    curl -L https://huggingface.co/Qdrant/clip-ViT-B-32-vision/resolve/main/model.onnx \
+    -o models/clip/clip-vit-base-patch32.onnx
+
 # Copy all backend source code into container
 COPY . /app
 
 # Expose port the app runs on
 EXPOSE 8000
+
+# Default command (adjust if needed)
+CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
