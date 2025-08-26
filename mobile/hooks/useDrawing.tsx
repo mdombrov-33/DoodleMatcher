@@ -12,6 +12,8 @@ export function useDrawing() {
   const [isLoading, setIsLoading] = useState(false);
   const [matches, setMatches] = useState<Match[]>([]);
 
+  const url = process.env.EXPO_PUBLIC_DOODLE_API_URL;
+
   //! PanResponder to track finger drawing
   const panResponder = PanResponder.create({
     onStartShouldSetPanResponder: () => true,
@@ -84,11 +86,16 @@ export function useDrawing() {
     setIsLoading(true);
     try {
       //* If using Android Studio emulator
-      const url = "http://10.0.2.2:8000/api/search-doodle";
+      // const url = "http://10.0.2.2:8000/api/search-doodle";
       //* If using Windows
       // const url = "http://localhost:8000/api/search-doodle";
       //* If using WSL 2
       // const url = "http://192.168.1.179:8000/api/search-doodle";
+
+      if (!url) {
+        console.error("Doodle API URL is not defined");
+        return null;
+      }
 
       const response = await fetch(url, {
         method: "POST",
