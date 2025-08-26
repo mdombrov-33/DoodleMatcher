@@ -127,7 +127,8 @@ Create a `.env` file in the backend directory with the following variables:
 ```env
 # Required for populating database with animal photos
 UNSPLASH_API_KEY=your_unsplash_access_key
-QDRANT_HOST=localhost
+# Qdrant database URL (production)
+QDRANT_URL=https://your-qdrant-instance.up.railway.app
 ```
 
 **Note**: Free-tier Unsplash has API rate limits—avoid making bulk requests too quickly when populating the database.
