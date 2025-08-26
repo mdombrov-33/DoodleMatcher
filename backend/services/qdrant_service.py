@@ -20,15 +20,35 @@ from qdrant_client.models import Distance, VectorParams
 import numpy as np
 from typing import List, Tuple
 
-#! use this two lines when using script to populate local db
+
+#! Qdrant Client Configuration
+# This section sets up the connection Qdrant vector database.
+# The same code works for both local development and production.
+# We control which instance is used via the QDRANT_URL environment variable.
+
+# Local development (optional)
+# Uncomment these lines if we want to populate a local Qdrant instance:
 # from dotenv import load_dotenv
+# load_dotenv()  # Load environment variables from .env
+# QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+# USE_HTTPS = False
+# PORT = 6333
 
-# load_dotenv()
+# Production (default)
+# For deployed backend, set QDRANT_URL in .env file to Railway Qdrant URL
+QDRANT_URL = os.getenv("QDRANT_URL")  # Must be set in .env for production
+USE_HTTPS = True  # Railway Qdrant uses HTTPS
+PORT = 443  # Default HTTPS port
 
-QDRANT_HOST = os.getenv("QDRANT_HOST", "qdrant")
+# Initialize the Qdrant client
+client = QdrantClient(
+    url=QDRANT_URL,
+    timeout=60,  # * Wait up to 60 seconds for requests, important for Railway to avoid Qdrant creating timeouts
+    https=USE_HTTPS,
+    port=PORT,
+)
 
-# Initialize Qdrant client
-client = QdrantClient(url=f"http://{QDRANT_HOST}:6333")
+# Collection name for storing animal photo embeddings
 COLLECTION_NAME = "animal_photos"
 
 
