@@ -104,6 +104,22 @@ The app has three main states on a single screen:
 5. **Decision to Run Local CLIP Model**  
    To maintain full control over embeddings, improve latency, and avoid cloud inference limits, a local CLIP model download was required. This added extra setup complexity but solved reliability and cost issues.
 
+6. **Railway + Qdrant Connection Issues**  
+   The qdrant-client library has compatibility issues with Railway's URL format, causing 6+ second connection delays and timeouts. **Solution**: Use explicit host/port configuration instead of URL format:
+
+   ```python
+   # ❌ This causes timeouts on Railway
+   client = QdrantClient(url="https://your-qdrant.railway.app")
+
+   # ✅ This works properly
+   client = QdrantClient(
+       host="your-qdrant.railway.app",
+       port=443,
+       https=True,
+       timeout=60
+   )
+   ```
+
 ## ⚙️ Environment Variables
 
 Create a `.env` file in the backend directory with the following variables:
@@ -111,6 +127,7 @@ Create a `.env` file in the backend directory with the following variables:
 ```env
 # Required for populating database with animal photos
 UNSPLASH_API_KEY=your_unsplash_access_key
+QDRANT_HOST=localhost
 ```
 
 **Note**: Free-tier Unsplash has API rate limits—avoid making bulk requests too quickly when populating the database.
@@ -200,30 +217,47 @@ pip install onnxruntime-gpu
 
    - Create new Railway project
    - Deploy Qdrant from template
-   - Note the internal URL
+   - Note the Railway domain URL
 
 2. **Deploy FastAPI backend**
 
    - Connect GitHub repository
    - Set environment variables:
+
      ```
      UNSPLASH_API_KEY=your-unsplash-key
-     QDRANT_HOST=localhost
      ```
+
    - Deploy from `/backend` directory
 
-3. **Upload CLIP model to production**
+3. **⚠️ Configure Qdrant client for Railway**
+
+   In `services/qdrant_service.py`, use the host/port format for Railway compatibility:
+
+   ```python
+   # For Railway deployment
+   client = QdrantClient(
+       host="your-qdrant-railway-domain.up.railway.app",
+       port=443,
+       https=True,
+       timeout=60
+   )
+   ```
+
+4. **Upload CLIP model to production**
 
    Ensure the ONNX model is available in your deployment environment.
 
-4. **Populate production database**
+5. **Populate production database**
+
+   To populate Railway Qdrant from your local machine, temporarily update the client configuration in `qdrant_service.py`, then:
 
    ```bash
    cd backend
    poetry run python -m scripts.populate_qdrant
    ```
 
-5. **Build mobile app**
+6. **Build mobile app**
    ```bash
    cd mobile
    eas build --platform all
