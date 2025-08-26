@@ -29,9 +29,6 @@ async def search_doodle(request: SearchRequest):
         # 2. Convert to PIL Image
         image = Image.open(io.BytesIO(image_bytes))
 
-        # Preprocess image
-        image = image.convert("RGB").resize((224, 224))
-
         # 3. Generate CLIP embedding
         embedding = get_image_embedding(image)
         if embedding is None:
