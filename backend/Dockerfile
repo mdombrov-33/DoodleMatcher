@@ -4,6 +4,11 @@ FROM python:3.12-slim-bookworm
 # Set working directory inside the container
 WORKDIR /app
 
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy dependency files to container
 COPY pyproject.toml poetry.lock* /app/
 
@@ -14,16 +19,8 @@ RUN pip install --no-cache-dir poetry
 RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi
 
-# Download ONNX model at build time
-RUN mkdir -p models/clip && \
-    curl -L https://huggingface.co/Qdrant/clip-ViT-B-32-vision/resolve/main/model.onnx \
-    -o models/clip/clip-vit-base-patch32.onnx
-
-# Copy all backend source code into container
+# Copy backend source code + pre-downloaded model
 COPY . /app
 
 # Expose port the app runs on
 EXPOSE 8000
-
-# Default command (adjust if needed)
-CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
